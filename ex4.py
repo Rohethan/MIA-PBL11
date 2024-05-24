@@ -32,13 +32,14 @@ def index():
     cur = mysql.connection.cursor()
 
 
-    cur.execute("SELECT * FROM MobilityWish") # There is 2 tables, Campus & MobilityWish
+    cur.execute("SELECT MobilityWish.studentMail, Campus.campusName FROM MobilityWish LEFT JOIN Campus ON MobilityWish.Campus_idCampus = Campus.idCampus")
+    # that sql query join in campus name based in the campus ids
     mysql.connection.commit() # Chose the latest; has more data
     htmlCode = "<ol>" # again, start a html str to send later
 
     # print the first cell (or column) of all rows (or records)
     for row in cur.fetchall():
-        htmlCode += "<li>"+str(row[1])+"</li>" #appends the 2nd index of the every query results, it in a loop, with a html list element
+        htmlCode += "<li>"+str(row[0])+" "+str(row[1])+"</li>" #appends the 2nd index of the every query results, it in a loop, with a html list element
 
     htmlCode += "</ol>"
     cur.close()
