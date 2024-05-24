@@ -36,6 +36,7 @@ def index():
     # <th> is a header for the table
     # source : https://developer.mozilla.org/fr/docs/Web/HTML/Element/table
 
+
     for i in range(1, 5):
         # here we add a row with two column. first is just value of i, second is i²
         htmlCode += "<tr><td>item #" + str(i) + "</td><td>" + str(i * i) + "</td></tr>"
