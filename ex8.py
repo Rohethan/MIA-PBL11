@@ -1,7 +1,6 @@
 from flask_mysqldb import MySQL
 from sshtunnel import SSHTunnelForwarder
-from flask import Flask
-
+from flask import Flask, request
 
 # Starting ssh tunnel for this exos's remote DB
 tunnel = SSHTunnelForwarder(
@@ -12,8 +11,6 @@ tunnel = SSHTunnelForwarder(
 )
 tunnel.start()
 
-
-
 app = Flask("MIA PBL11")
 
 app.config['MYSQL_HOST'] = '127.0.0.1'
@@ -23,6 +20,7 @@ app.config['MYSQL_PASSWORD'] = 'sei4B'
 app.config['MYSQL_DB'] = 'MIAPBL11-STUDENT'
 app.config['MYSQL_PORT'] = tunnel.local_bind_port
 mysql = MySQL(app)
+
 
 @app.route('/')
 def index():
@@ -38,16 +36,17 @@ def index():
     #this text is returned
     return htmlCode
 
+
 @app.route("/list")
 def list():
     # you must create a Cursor object
     # it will let you execute the needed query
     cur = mysql.connection.cursor()
 
-
-    cur.execute("SELECT MobilityWish.studentMail, Campus.campusName FROM MobilityWish LEFT JOIN Campus ON MobilityWish.Campus_idCampus = Campus.idCampus")
+    cur.execute(
+        "SELECT MobilityWish.studentMail, Campus.campusName FROM MobilityWish LEFT JOIN Campus ON MobilityWish.Campus_idCampus = Campus.idCampus")
     # that sql query join in campus name based in the campus ids
-    mysql.connection.commit() # Chose the latest; has more data
+    mysql.connection.commit()  # Chose the latest; has more data
     htmlCode = """
     Menu<br>
     <a href='/'>Homepage</a><br>
@@ -56,11 +55,11 @@ def list():
     <table border='1'>
     <tr>
     <th>Student's mail</th>
-    <th>Campus choice</th></tr>""" # again, start a html str to send later
+    <th>Campus choice</th></tr>"""  # again, start a html str to send later
 
     # print the first cell (or column) of all rows (or records)
     for row in cur.fetchall():
-        htmlCode += "<tr><td>"+str(row[0])+"</td><td>"+str(row[1])+"</td></tr>"
+        htmlCode += "<tr><td>" + str(row[0]) + "</td><td>" + str(row[1]) + "</td></tr>"
 
     htmlCode += "</table>"
     cur.close()
@@ -99,5 +98,6 @@ def add():
     # we close the form
     htmlCode += "</select><br><input type='submit' value='Save'></form>"
     return htmlCode
+
 
 app.run()
